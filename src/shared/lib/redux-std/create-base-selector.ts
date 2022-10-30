@@ -1,5 +1,5 @@
 import { rootState } from "./root-state"
-
+									//entities/todo
 export const createBaseSelector = <T>(rootKey: string) => {
 	return (state: rootState) => {
 		if(rootKey in state) {

@@ -1,12 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { todoModel } from './entities/todo'
-import { Input } from './shared/ui/input'
+import { listModel } from './entities/todo'
+import { useAction, useAppSelector } from './shared/lib/redux-std'
 
 
 function App() {
-  const dispatch = useDispatch()
-  console.log(todoModel.actions.changeValue)
+  const fetchList = useAction(listModel.actions.getList)
+  const isLoading = useAppSelector(listModel.selectors.isUsersLoading)
+  console.log(isLoading, ' Selector')
+  useEffect(() => {
+    fetchList()
+  }, [fetchList])
   return (
     <div>
       <button></button>

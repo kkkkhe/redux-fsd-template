@@ -1,15 +1,15 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { createEpicMiddleware } from "redux-observable";
-import { todoModel } from "../../entities/todo";
+import { listModel } from "../../entities/todo";
 
 
-const rootReducer = combineReducers({
-	todoSlice: todoModel.todoSlice.reducer
-})
+
 
 const epicMiddleware = createEpicMiddleware()
 export const store = configureStore({
-	reducer: rootReducer,
+	reducer: {
+		...listModel.reducers,
+	},
 	middleware: (getDefaultMiddleware) => 
 	getDefaultMiddleware().concat(epicMiddleware)
 })

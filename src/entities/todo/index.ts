@@ -1,1 +1,1 @@
-export * as todoModel from './model'
+export * as listModel from './model'
