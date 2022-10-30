@@ -5,12 +5,12 @@ import { useAction, useAppSelector } from './shared/lib/redux-std'
 
 
 function App() {
-  const fetchList = useAction(listModel.actions.getList)
+  const fetchUser = useAction(listModel.actions.userLoading)
   const isLoading = useAppSelector(listModel.selectors.isUsersLoading)
   console.log(isLoading, ' Selector')
   useEffect(() => {
-    fetchList()
-  }, [fetchList])
+    fetchUser(1)
+  }, [fetchUser])
   return (
     <div>
       <button></button>

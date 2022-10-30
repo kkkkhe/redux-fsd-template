@@ -1,35 +1,43 @@
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
+import { Action, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ofType } from "redux-observable";
+import { map, Observable, switchMap } from "rxjs";
+import { ajax } from 'rxjs/ajax';
 import { createBaseSelector } from "../../../shared/lib/redux-std";
 
 const initialState = {
-	isLoading: false
+	isLoading: false,
+	user: null
 }
 type State = typeof initialState
 const reducerPath = 'entities/todo'
-export const todoSlice = createSlice({
+export const slice = createSlice({
 	name: reducerPath,
 	initialState,
 	reducers: {
-		changeValue(state, action: PayloadAction<boolean>){
-			console.log(action.payload)
-			state.isLoading = action.payload
+		userLoading(state, action: PayloadAction<number>){
+			console.log('STARTLOADING')
+			state.isLoading = true
+		},
+		endLoading(state){
+			console.log('ENDLOADING')
+			state.isLoading = false
+		},
+		succeedLoading(state){
+			state
 		}
 	}
 })
 
-const getList = createAsyncThunk(
-	reducerPath + "/get-list",
-	(_, { dispatch }) => {
-		dispatch(todoSlice.actions.changeValue(true))
-		return axios.get('https://jsonplaceholder.typicode.com/users')
-		.then(res => console.log(res))
-		.finally(() => {
-			dispatch(todoSlice.actions.changeValue(false))
-		})
-	}
-);
-
+const getListEpic = (action$:Observable<Action>):Observable<Action> => action$.pipe(
+	ofType(reducerPath + '/userLoading'),
+	switchMap((action) => ajax.getJSON('https://jsonplaceholder.typicode.com/users/1').pipe(
+			map(response => {
+				console.log(response)
+			}),
+		)
+	),
+	map(() => slice.actions.endLoading())
+)
 
 //selectors 
 //											'entities/todo'
@@ -41,11 +49,15 @@ const isUsersLoading = createSelector(
 
 
 export const actions = {
-	getList,
+	userLoading: slice.actions.userLoading,
 }
 
 export const selectors = {
 	isUsersLoading
 }
 
-export const reducers = {[reducerPath]: todoSlice.reducer}
+export const reducers = {[reducerPath]: slice.reducer}
+
+export const epics = {
+	getListEpic
+}
