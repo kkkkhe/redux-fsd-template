@@ -1,6 +1,6 @@
 import { Action, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ofType } from "redux-observable";
-import { map, Observable, switchMap } from "rxjs";
+import { catchError, debounce, debounceTime, distinctUntilChanged, map, mergeMap, Observable, startWith, switchMap, tap } from "rxjs";
 import { ajax } from 'rxjs/ajax';
 import { createBaseSelector } from "../../../shared/lib/redux-std";
 
@@ -28,17 +28,41 @@ export const slice = createSlice({
 	}
 })
 
+// const getListEpic = (action$:Observable<Action>):Observable<Action> => action$.pipe(
+// 	ofType(reducerPath + '/userLoading'),
+// 	switchMap((action) => ajax.getJSON('https://jsonplaceholder.typicode.com/users/1').pipe(
+// 			tap((response:any) => {
+// 				console.log(Object.values(response).map(el => typeof el ==='number'? el * 10 : el))
+// 			}),
+// 		)
+// 	),
+// 	map(() => slice.actions.endLoading())
+// )
+// const getListEpic = (action$:Observable<Action>):Observable<Action> => action$.pipe(
+// 	ofType(reducerPath + '/userLoading'),
+// 	switchMap((action) => ajax.getJSON('https://jsonplaceholder.typicode.com/users/1').pipe(
+// 			tap((response:any) => {
+// 				console.log(response)
+// 			}),
+// 			catchError((error) => error),
+// 		)
+// 	),
+// 	map(() => slice.actions.endLoading())
+// )
+
 const getListEpic = (action$:Observable<Action>):Observable<Action> => action$.pipe(
 	ofType(reducerPath + '/userLoading'),
-	switchMap((action) => ajax.getJSON('https://jsonplaceholder.typicode.com/users/1').pipe(
-			map(response => {
-				console.log(response)
+	debounceTime(500),
+	distinctUntilChanged(),
+	mergeMap((action:any) => ajax.getJSON(`https://jsonplaceholder.typicode.com/posts?userId=${action.payload}`).pipe(
+			map((response:any) => {
+				return response
 			}),
+			catchError((error) => error),
 		)
 	),
-	map(() => slice.actions.endLoading())
-)
-
+	// map(() => slice.actions.endLoading())
+	)
 //selectors 
 //											'entities/todo'
 const baseSelector = createBaseSelector<State>(reducerPath)

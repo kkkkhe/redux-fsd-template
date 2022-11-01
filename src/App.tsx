@@ -8,12 +8,12 @@ function App() {
   const fetchUser = useAction(listModel.actions.userLoading)
   const isLoading = useAppSelector(listModel.selectors.isUsersLoading)
   console.log(isLoading, ' Selector')
-  useEffect(() => {
-    fetchUser(1)
-  }, [fetchUser])
   return (
     <div>
-      <button></button>
+      <button onClick={() => fetchUser(1)}>USER 1</button>
+      <button onClick={() => fetchUser(2)}>USER 2</button>
+      <button onClick={() => fetchUser(3)}>USER 3</button>
+      <button onClick={() => fetchUser(4)}>USER 4</button>
     </div>
   )
 }
